@@ -3,11 +3,12 @@
 !	N dimensional quantum trajectory code with linear quantum force
 !	test with coupled oscilator for each DOF (3 dim)
 !*********************************************************************
+      use cdat 
+
       implicit real*8(a-h,o-z)
-      real*8 :: ki,po,qu,tot
-      real*8 :: t,k1,k2,px,py,ax,ay
+     
       integer*4 :: Ntraj,counter
-      real*8 :: dt,dt2,s
+      
       real*8,dimension(:,:),allocatable :: dvdx,x,p,qf
       
       integer*4,dimension(:),allocatable :: idum
@@ -22,7 +23,6 @@
 
 ! --- the initial conditions
       open(100,file='energy.dat')
-!      open(101,file='x.dat')
       open(101,file='traj.dat')
       open(103, file='cor.dat',status='unknown',action='write')
 
@@ -32,6 +32,7 @@
       read(10,*) Ndim
       read(10,*) kmax,dt
       read(10,*) cf0
+      read(10,*) am0 
       
       close(10)
 
@@ -58,7 +59,7 @@
       p0 = 0d0
       x0 = 0d0
       cf = cf0
-      am = 1d0
+      am = am0 
       
       sigma = 1d0
 
@@ -66,12 +67,15 @@
 
       call seed(idum,Ndim)
 
-
-      write(*,*) 'Initial Conditions'
-      write(*,*) 'Ntraj=',Ntraj
-	print *,'Ndim=',Ndim
-	print *,'kmax=',kmax
-	print *,'dt=',dt
+      write(6,1001) sigma,Ntraj,kmax,dt,am0,p0,q0
+1001  format('Initial Conditions'/ ,                   &
+            'intial gaussian width = ', f10.6/,        & 
+            'Ntraj = ', i6/ ,          &
+            'Kmax  = ', i6/ ,          &
+            'dt    = ', f10.6/ ,       &
+            'Mass  = ', f10.6/ ,       &
+            'p0    = ', f10.6/ ,       &
+            'q0    = ', f10.6/)
 
 ! initial grid points 
       do i=1,Ntraj
@@ -90,15 +94,15 @@
 
       w=1d0/dble(Ntraj)
       do j=1,ndim 
-        g(j) = 1d0 
+        g(j) = (1d0,0d0)
       enddo 
-      g(ndim+1) = 0d0 
+      g(ndim+1) = (0d0,0d0)
 
 !-----------------------------------------	
 
 ! ---  time propagation	
       time: do counter=1,kmax
-        
+
 ! ----- increase t by dt
         
         t=t+dt
@@ -111,7 +115,7 @@
 
         write(103,10000) t,cor,abs(cor) 
       
-        write(101,10000) t,(x(1,i),i=1,40),(x(2,i),i=1,40)
+        write(101,10000) t,(x(1,i),i=1,20)
 
 !	  s = 0d0
         write(100,10000) t,enk,env,enq,(enk+env+enq)
@@ -153,7 +157,7 @@
 	end subroutine
 !----------------------------------------------
 
-      subroutine prop_c(am,dt,nb,ntraj,ndim,w,x,p,c,dc)
+      subroutine prop_c(am,dt,nb,ndim,ntraj,w,x,p,c,dc)
 
       use cdat, only : im 
 
@@ -211,8 +215,21 @@
         enddo 
       enddo       
 
-! --- matrix mat1 = <p*f|df> 
-       
+! --- matrix mat1 = <p*f|df>, simplified version for linear basis 
+!     needs modification if using higher order basis 
+      traj: do i=1,ntraj 
+        do j=1,ndim 
+          f(j) = x(j,i) 
+        enddo 
+        f(ndim+1) = 0d0 
+
+        do j=1,nb 
+          do k=1,nb 
+            mat1(k,j) = mat1(k,j)+p(j,i)*f(k)*df(j,j)*w(i)
+          enddo 
+        enddo 
+      enddo traj 
+
       mat = 2d0*mat1 + im*mat2
       mat = -mat/2d0/am0
 
@@ -243,15 +260,11 @@
 
       real*8 :: f(nb)
 
-      complex*16 :: g(nb),dg(nb)
+      complex*16,intent(inout) :: g(nb)
 
       complex*16,intent(out) :: cor 
-
-      call prop_c(am,dt,nb,ndim,ntraj,w,x,p,g,dg)
-
-      do j=1,nb 
-        g(j) = g(j)+dg(j)*dt 
-      enddo 
+      
+      complex*16 :: z0,dg(nb)
 
       cor = (0d0,0d0) 
 
@@ -260,9 +273,24 @@
           f(j) = x(j,i)
         enddo 
         f(ndim+1) = 1d0 
+        
+        z0 = dot_product(f,g)
 
-        cor = cor+ conjg(dot_product(f,g))*w(i)
+        do j=1,ndim
+          do k=1,nb 
+            cor = cor+ conjg(z0)*x(j,i)*w(i)
+          enddo 
+        enddo 
+
+      enddo
+
+! --- update c 
+      call prop_c(am,dt,nb,ndim,ntraj,w,x,p,g,dg)
+
+      do j=1,nb 
+        g(j) = g(j)+dg(j)*dt 
       enddo 
+
 
       return 
       end subroutine 
