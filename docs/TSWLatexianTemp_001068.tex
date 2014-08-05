@@ -1,0 +1,58 @@
+\documentclass[11pt]{revtex4}
+
+\usepackage[utf8x]{inputenc}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{mystyle}
+\usepackage{amsmath}
+\usepackage{bm}
+
+\begin{document}
+
+
+\title{Correlation function}
+\author{Bing Gu}
+\date{8/4/14}
+\maketitle
+
+\section{QM correlation}
+Quantum mechanical correlation is defined as 
+\be C_{AB} = Tr[\hat{\rho} AU^\dagger(t)BU(t) ] \ee 
+where $U(t)$ is the propagation operator for time-independent Hamiltonian, 
+\be U(t) = \exp(-\im \hat{H}t/\hbar) \ee   
+At absolute zero, 
+\be \hat{\rho} = | \psi_0 \ket \bra \psi_0 |, \ee
+then correlation becomes 
+\begin{flalign}
+ C_{AB} & = \bra \psi_0 | \hat{A}U^\dagger(t)\hat{B}U(t) | \psi_0 \ket  \\ 
+	     & =    \bra \psi_0 | AU^\dagger(t)B | \psi_t \ket \\ 
+	     & = \bra U(t)A^\dagger\psi_0 | B | \psi_t \label{eq:corr} \ket  
+\end{flalign} 
+Assume $\hat{A} = \sum_i \hat{x}_i$ and define $\phi(\bm x,0) = \sum_i x_i\psi(\bm x,0)$, $\phi(\bm x,t)$ is a wavefunction with nodes, at least one node at $\bm x=0$ at starting point, then $  U(t)A^\dagger\psi_0 $ is equivalent to propagate wavefunction $\phi(\bm x,t)$.
+
+A wavefunction with nodes can be described by product of a nodeless wavepacket and a polynomial function  
+\be \phi(\bm x,t) = \psi(\bm x,t) \chi(\bm x,t), \label{eq:mix} \ee
+where $\chi(\bm x,t)$ is represented by a polynomial basis $f(\bm x)$, 
+\be \chi(\bm x,t) = \bm f^T \bm c = \sum_i f_ic_i \ee 
+For linear basis, $f(\bm x) = (1,x_1,x_2,\dots, x_{N_{dim}})$, $N_{dim}$ is the number of degree of freedom, usually taken as $3 \times N_{atom}$ in Cartesian space.
+Substitute Eq. (\ref{eq:mix}) into time-dependent \se, after some algebraic manipulations, one obtain 
+\be \dot{\bm c} = - \frac{\hbar}{2m}\bf{M}^{-1}(2\Pi + \im \bf  D)\bm c \label{eq:prop_c}. \ee
+where 
+\begin{flalign}
+ \Pi_{ij} & = \sum_{\alpha=1}^{N_{dim}} \bra p_\alpha f_i | \grad_\alpha f_j \ket, \\ 
+D_{ij} & = \sum_{\alpha=1}^{N_{dim}} \bra \grad_\alpha f_i | \grad_\alpha f_j \ket \\ 
+M_{ij} & = \bra f_i | f_j \ket 
+\end{flalign}   
+Here $\bra \cdots \ket$ represents average over ensemble of quantum trajectories. 
+Substitute Eq. (\ref{eq:mix}) back into Eq. (\ref{eq:corr}), we obtain 
+\be C_{AB}(t) = \bra \psi(\bm x,t)\chi(\bm x,t) | \hat{B} | \psi(\bm x,t) \ket \ee
+Assume $\hat{B}$ is a multiplicative operator, most commonly is position-dependent operators, $\hat{B}(\bm x)$,  
+\begin{flalign}
+ C_{AB}(t) &= \int d\bm x \rho(\bm x,t) \chi^*(\bm x,t)B(\bm x) \\ 
+		 &\approx  \int d\bm x \rho(\bm x,t) [\bm c^*(t) \cdot \bm f(\bm x)] B(\bm x) \\ 
+		 & = \sum_{k=1}^{N_{traj}} w^{(k)} [\bm c^*(t) \cdot \bm f(\bm x^{(k)})] B(\bm x^{(k)})
+\end{flalign}
+
+  
+\end{document}
