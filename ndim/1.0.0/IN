@@ -1,0 +1,8 @@
+2048        # number of trajectories
+2            # number fo dimensions
+8192,0.0009765625     # time steps
+0.d0      # friction constant
+1d0       # mass [a.u.] 
+
+# reference numbers 
+# 1/2**10 = 0.0009765625
