@@ -1,0 +1,9 @@
+2000          # number of trajectories
+2000,0.005d0 # time steps
+1d0         # mass
+4d0       # constants for initial wavefunction
+-1d0         # center for the wavepacket
+0.5d0         # initial momentum
+5           # idum1
+2	    # size of basis for polynomials 
+
