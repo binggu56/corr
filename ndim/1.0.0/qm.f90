@@ -67,15 +67,15 @@
 
       call seed(idum,Ndim)
 
-      write(6,1001) sigma,Ntraj,kmax,dt,am0,p0,q0
+      write(6,1001) sigma,Ntraj,kmax,dt,am0,p0(1),x0(1)
 1001  format('Initial Conditions'/ ,                   &
             'intial gaussian width = ', f10.6/,        & 
             'Ntraj = ', i6/ ,          &
             'Kmax  = ', i6/ ,          &
             'dt    = ', f10.6/ ,       &
-            'Mass  = ', f10.6/ ,       &
-            'p0    = ', f10.6/ ,       &
-            'q0    = ', f10.6/)
+            'Mass in a.u.          = ', f10.6/ ,       &
+            'initial momentum      = ', f10.6/ ,       &
+            'initial displacement  = ', f10.6/)
 
 ! initial grid points 
       do i=1,Ntraj
