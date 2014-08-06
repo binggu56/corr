@@ -33,6 +33,7 @@
       read(10,*) kmax,dt
       read(10,*) cf0
       read(10,*) am0 
+      read(10,*) x00,p00 
       
       close(10)
 
@@ -56,8 +57,8 @@
 
       dt2 = dt/2d0
       t = 0d0
-      p0 = 0d0
-      x0 = 0d0
+      p0 = p00
+      x0 = x00
       cf = cf0
       am = am0 
       
@@ -65,7 +66,7 @@
 
       alpha = 1d0/2d0/sigma**2
 
-      call seed(idum,Ndim)
+
 
       write(6,1001) sigma,Ntraj,kmax,dt,am0,p0(1),x0(1)
 1001  format('Initial Conditions'/ ,                   &
@@ -78,6 +79,8 @@
             'initial displacement  = ', f10.6/)
 
 ! initial grid points 
+      call seed(idum,Ndim)
+
       do i=1,Ntraj
         do j=1,Ndim
           x(j,i)=gasdev(idum(j))
@@ -150,7 +153,7 @@
 	integer*4, intent(IN) :: Ndim
 	integer*4, intent(OUT) :: idum(Ndim)
 	do i=1,Ndim
-	  idum(i) = 5 + i
+	  idum(i) = 4 + i
 	enddo
 
 	return
@@ -172,8 +175,8 @@
 
       complex*16 :: cor,mat1(nb,nb),mat(nb,nb),mat2(nb,nb), c(nb),dc(nb)
 
-      s = (0d0,0d0) 
-      mat1 = (0d0,0d0) 
+
+
       mat = (0d0,0d0)
       am0 = am(1)
 
@@ -193,7 +196,9 @@
 !      enddo 
 !      df_t = transpose(df)
       mat2 = matmul(transpose(df),df)
+
 ! --- matrix matrix mat = <f|f> 
+      s = 0d0 
       do i=1,ntraj 
 
         do j=1,ndim 
@@ -217,25 +222,31 @@
 
 ! --- matrix mat1 = <p*f|df>, simplified version for linear basis 
 !     needs modification if using higher order basis 
-      traj: do i=1,ntraj 
+!     O(ndim**3*ntraj) need reduce 
+
+      mat1 = (0d0,0d0)
+
+      traj: do i=1,ntraj
+
         do j=1,ndim 
           f(j) = x(j,i) 
         enddo 
-        f(ndim+1) = 0d0 
+        f(ndim+1) = 1d0 
 
-        do j=1,nb 
+        do j=1,ndim 
           do k=1,nb 
-            mat1(k,j) = mat1(k,j)+p(j,i)*f(k)*df(j,j)*w(i)
+!            do n=1,ndim 
+              mat1(k,j) = mat1(k,j)+p(j,i)*f(k)*df(j,j)*w(i)
+!            enddo 
           enddo 
         enddo 
+        
       enddo traj 
 
       mat = 2d0*mat1 + im*mat2
       mat = -mat/2d0/am0
 
-      dc = (0d0,0d0) 
       dc = matmul(mat,c)
-
 
       call inverse(s,sinv,nb)
 
