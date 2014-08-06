@@ -193,7 +193,6 @@
 !      enddo 
 !      df_t = transpose(df)
       mat2 = matmul(transpose(df),df)
-
 ! --- matrix matrix mat = <f|f> 
       do i=1,ntraj 
 
@@ -215,6 +214,7 @@
         enddo 
       enddo       
 
+
 ! --- matrix mat1 = <p*f|df>, simplified version for linear basis 
 !     needs modification if using higher order basis 
       traj: do i=1,ntraj 
@@ -235,6 +235,7 @@
 
       dc = (0d0,0d0) 
       dc = matmul(mat,c)
+
 
       call inverse(s,sinv,nb)
 
@@ -277,9 +278,7 @@
         z0 = dot_product(f,g)
 
         do j=1,ndim
-          do k=1,nb 
             cor = cor+ conjg(z0)*x(j,i)*w(i)
-          enddo 
         enddo 
 
       enddo
