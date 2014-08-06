@@ -1,4 +1,5 @@
       program main
+
       use cdat
 
       implicit real*8(a-h,o-z)
@@ -190,7 +191,7 @@
       
       real*8 :: f(nb),df(nb),s(nb,nb),sinv(nb,nb)
       
-      complex*16 :: cor,m1(nb,nb),m(nb,nb),m2(nb,nb)
+      complex*16 :: cor,m1(nb,nb),mat(nb,nb),m2(nb,nb)
 
       complex*16 :: c(nb),dc(nb)
 
@@ -220,17 +221,18 @@
 !          m(j,i) = -1d0/2d0/am*m(j,i)
 !        enddo
 !      enddo
-      m = 2d0*m1+im*m2 
-      m = -m/2d0/am 
+      mat = 2d0*m1+im*m2 
+      mat = -mat/2d0/am 
 
-      dc = matmul(m,c)
+      dc = matmul(mat,c)
 !      do i=1,nb
 !        dc(i) = (0d0,0d0)
 !        do j=1,nb
 !          dc(i) = dc(i)+m(i,j)*c(j)
 !        enddo
 !      enddo
-      
+      print *,'m =', mat 
+
       call inverse(s,sinv,nb)
 
       dc = matmul(sinv,dc)
